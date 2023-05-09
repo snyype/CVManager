@@ -2,6 +2,9 @@
 <div>
 <head>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+   
+
 </head>
 
     <div class="p-6 text-gray-900 w-1000">
@@ -16,7 +19,7 @@
     </div>
     
     <div class="m-8" wire:loading>
-        SEARCHING..
+        SEARCHING......
     </div>
 
 @if (!empty($query))
@@ -43,7 +46,7 @@
         <div class="basis-1/3 mt-8 p-3 ml-8">
             <a href="/admin/view/{{$cvs['id']}}">
                 <x-primary-button class="ml-3 p-5">
-                    {{ __('Open') }}
+                    {{ __('Open') }}  
                 </x-primary-button>
                 </a>
         </div>
@@ -54,12 +57,13 @@
 @else
 
 <div class="border border-black m-5 h-20 text-justify">
-    <p class="m-5">NO RESULTS....</p>
+    <p class="m-5">NO RESULTS.... <li class="fa fa-search"></li></p>
     
 </div>
 
 @endif
-          @else
+
+@else
          
       
     
@@ -77,7 +81,7 @@
         } else {
           searchBar.focus(); // If it doesn't, focus the search bar to add focus
         }
-        
+
       }
     });
   });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cv;
 use App\Models\Interviewer;
+use Illuminate\Support\Facades\Mail;
 
 class CVController extends Controller
 {
@@ -75,7 +76,7 @@ class CVController extends Controller
 
     public function indcv($id)
     {
-        $data0 = interviewer::where('status','available');
+        $data0 = interviewer::where('status','available')->get();
         $data = CV::find($id);
         return view('indcv',compact('data','data0'));
     }
@@ -96,8 +97,38 @@ class CVController extends Controller
         $data2 = interviewer::find($request->interviewer);
         $data->status = $request->status;
         $data->interviewer = $request->interviewer;
-        $data->datetime = $request->datetime;
+        $data->datetime = $request->datetime;   
         $data->save();
+        
+
+        if($data->status == "Hired")
+        {
+           $details = [
+
+            'user' => $data->name,
+            'datetime' => $data->datetime,
+            'interviewer' => $data->interviewer,
+            'status' => $data->status,
+            'technology' =>$data->tech,
+
+           ];
+
+           Mail::to($data->email)->send(new \App\Mail\Mail($details));
+
+        }
+
+        elseif($data->status == "Rejected")
+        {
+            $details = [
+
+                'user' => $data->name,
+                'status' => $data->status,
+               
+    
+               ];
+
+               Mail::to($data->email)->send(new \App\Mail\RejectedMail($details));
+        }
 
         return redirect(url()->previous());
 

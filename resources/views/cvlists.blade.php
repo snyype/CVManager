@@ -11,10 +11,21 @@
                 <div class="p-6 text-gray-900">
                     {{ __("LIST OF SUBMITTED CV") }}
                 </div><br>
+
+                
                 @foreach($data as $item)
-                <div class="pl-6 text-gray-900">
-                 <a href="/admin/view/{{$item->id}}"><label for="name">{{$item->name}}</label></a>
-                </div><br>
+               
+
+                    <div class="flex flex-row">
+                        <div class="basis-1/6 mt-8 ml-8">
+                            <a href="/admin/view/{{$item->id}}"><label class="mr-10" for="name">{{$item->name}}</label></a>
+                        </div>
+                        <div class="basis-1/6 mt-8 ml-8 mb-10">
+                            <label class="ml-10 mb-10" for="">{{$item->status}}</label>
+                        </div>
+                    </div>
+
+                
                @endforeach
             </div>
         </div>

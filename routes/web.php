@@ -84,7 +84,17 @@ Route::get('/reset-password/{token}', function (string $token) {
 })->middleware('guest')->name('password.reset');
 
 
-
+Route::get('send-mail', function () {
+   
+    $details = [
+        'title' => 'Mail from ItSolutionStuff.com',
+        'body' => 'This is for testing email using smtp'
+    ];
+   
+    \Mail::to('snypeee@gmail.com')->send(new \App\Mail\Mail($details));
+   
+    dd("Email is Sent.");
+});
 
 
 

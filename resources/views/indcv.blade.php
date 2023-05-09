@@ -14,7 +14,7 @@ use Carbon\Carbon;
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __("CV / $data->name") }}
+           <a href="/admin/cvlists">{{ __("CV") }}</a> / {{ __("$data->name") }}
         </h2>
     </x-slot>
 
@@ -66,7 +66,7 @@ use Carbon\Carbon;
                         <label>{{$data->email}}</label><br>
                         <label>{{$data->ref}}</label><br>
                         <label>{{$data->interviewer}}</label><br>
-                        <label>@if($data['datetime'] == NULL)N/A @else <label for="">{{ Carbon::create($data->datetime)->diffForHumans() }}</label>{{$data->datetime}}</label>@endif<br>
+                        <label>@if($data['datetime'] == NULL)N/A @else <label for="">{{ Carbon::create($data->datetime)->diffForHumans() }}</label> {{$data->datetime}}</label>@endif<br>
                         <label> @if($data['status'] == "submited") {{$data->status}} @else <label class="text-green-700" for="">{{$data->status}}</label>@endif </label><br>
                     
                     </div>
@@ -75,12 +75,16 @@ use Carbon\Carbon;
                   <div class="mt-5">
 
               
-                        <a href="/admin/cv/change/status/{{$data->id}}">
-                        <x-primary-button class="ml-3">
+                        
+                        <x-primary-button class="ml-3" id="hidecontainer" onclick="removeStatus()">
                             {{ __('CHANGE STATUS') }}
                         </x-primary-button>
-                        </a>
+                        <x-primary-button class="ml-3 hidden" id="showcontainer" onclick="addStatus()">
+                            {{ __('CHANGE STATAUS') }}
+                        </x-primary-button>
                         
+                        
+
                         <x-primary-button class="ml-3" id="postYourAdd" onclick="postYourAdd()">
                             {{ __('VIEW CV') }}
                         </x-primary-button>
@@ -124,18 +128,32 @@ function removeYourAdd() {
   $("#postYourAdd").removeClass("hidden");
 }
 
+function addStatus() {
+ var div =  $("#status");
+ div.addClass("hidden");
+
+  
+}
+function removeStatus() {
+ var div =  $("#status");
+ div.removeClass("hidden");
+ $("#hidecontainer").addClass("hidden");
+  
+}
+
+
 
    
 
 </script>
    
 
-<div class="container">
+<div id="status" class="container hidden">
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{ __("CV OF $data->name") }}
+                    {{ __("CHANGE CV STATUS OF $data->name") }}
                 </div><br>
                 <div class="pl-6 text-gray-900">
                  <form action="/admin/changestatus/{{$data->id}}" method="POST">
@@ -143,7 +161,7 @@ function removeYourAdd() {
                     <label for="">CHANGE STATUS</label>
                     
                     <select name="status" id="status" required>
-                        <option value="">{{$data->status}}</option>
+                        <option value="{{$data->status}}">{{$data->status}}</option>
                         <option value="Shortlisted">Shortlisted</option>
                         <option value="1st Interview Done">1st Interview Done</option>
                         <option value="2nd Interview Done">2nd Interview Done</option>
@@ -154,7 +172,9 @@ function removeYourAdd() {
 
                     <label for="">ASSIGN INTERVIEWER</label>
                     <select name="interviewer" id="status" required>
-                        <option value="">{{$data->interviewer}}</option>
+                    
+                        <option value="{{$data->interviewer}}">{{$data->interviewer}}</option>
+                     
                      
                         @foreach($data0 as $item)
                         <option value="{{$item->name}}">{{$item->name}}</option>
@@ -164,7 +184,7 @@ function removeYourAdd() {
                     </select><br><br>
 
                     <label for="">ASSIGN DATE AND TIME</label>
-                    <input type="datetime-local" value="{{$data->datetime}}" name="datetime"    >
+                    <input min="<?php echo date('Y-m-d\TH:'); ?>" type="datetime-local" value="{{$data->datetime}}" name="datetime"    >
                     <x-primary-button class="ml-3">
                         {{ __('SUBMIT') }}
                     </x-primary-button>

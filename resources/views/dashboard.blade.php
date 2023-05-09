@@ -50,13 +50,46 @@ $cvcount = Cv::all()->count();
 
                 <form action="/formsubmit" method="POST" enctype='multipart/form-data'>
                     @csrf
+
+                    <div class="flex flex-row">
+                        <div class="basis-1/6 mt-10 ml-10">
+                            <input class="m-10 border-none border-double rounded-lg" type="text" value="NAME" required><br>
+                            <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="TECHNOLOGY" required><br>
+                            <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="LEVEL:"   required><br>
+                            <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="SALARY EXPECTATION" required><br>
+                            <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="EXPERIENCEE" required><br>
+                            <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="PHONE NUMBER" required><br>
+                            <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="EMAIL" required><br>
+                            <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="REFRENCE" required><br>
+                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name"></label><br>
+                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">LEVEL:</label><br>
+                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">SALARY EXPECTATION :</label><br>
+                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">EXPERIENCE:</label><br>
+                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">PHONE NUMBER:</label><br>
+                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">EMAIL:</label><br>
+                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">REFRENCE:</label><br>
+                        </div>
+                        <div class="basis-1/6 mt-10 ml-10">
+                            <input class="m-10 border border-4 border-double rounded-lg" type="text" name="name" required><br>
+                            <input class="m-10 border border-4 border-double rounded-lg" type="text" name="tech" required><br>
+                            <input class="m-10 border border-4 border-double rounded-lg" type="text" name="level" required><br>
+                            <input class="m-10 border border-4 border-double rounded-lg" type="text" name="salaryexp" required><br>
+                            <input class="m-10 border border-4 border-double rounded-lg" type="text" name="exp" required><br>
+                            <input class="m-10 border border-4 border-double rounded-lg" type="number" name="number" required><br>
+                            <input class="m-10 border border-4 border-double rounded-lg" type="email" name="email" required><br>
+                            <input class="m-10 border border-4 border-double rounded-lg" type="text" name="ref" required><br>
+
+                        </div>
+                    </div>
+
+
                 <div class="p-6 pb-0 text-gray-900">
-                   <label for="name">Name:</label><br>
-                   <input type="text" name="name" required>
+                   
+                   
                 </div>
                 <div class="p-6 pb-0 text-gray-900">
                    <label for="tech">Technology:</label><br>
-                   <input type="text" name="tech" required>
+                   
                 </div>
                 <div class="p-6 pb-0 text-gray-900">
                    <label for="level">Level:</label><br>

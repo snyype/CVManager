@@ -9,6 +9,8 @@ class SearchCV extends Component
 {
     public $query;
     public $cv;
+    
+    protected $queryString = ['query'];
 
     public function mount()
     {
@@ -28,8 +30,13 @@ class SearchCV extends Component
 
     public function updatedQuery()
     {
-        
-        $this->cv = Cv::where('name',"=",$this->query)->get()->toArray();
+   
+
+        if (!empty($this->query)) {
+            $this->cv = Cv::where('name', 'LIKE', $this->query[0].'%')->orWhere('tech', 'LIKE', '%'.$this->query.'%')->get();
+        } else {
+            $this->cv = [];
+        }
     }
 
     public function render()
