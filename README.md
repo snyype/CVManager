@@ -1,6 +1,6 @@
 # CVManager
 
-CVManager is a web application built with Laravel that allows users to create, edit, and manage their CVs online.
+CVManager is a web application built with Laravel that allows HR and Admins to Shortlist, Hire, Send offer letter to users email and assign task to user online.
 
 ## Installation
 
