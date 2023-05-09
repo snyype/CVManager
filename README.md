@@ -40,7 +40,7 @@ php artisan serve
 
 To use CVManager, open your web browser and go to http://localhost:8000. From there, you can create a new account or log in to an existing account.
 
-Once you're logged in, you can create a new CV, add sections to your CV, and fill in the details for each section. You can also edit and delete your CVs as needed.
+Once you're logged in, you can create a new CV, add sections to your CV, and fill in the details for each section. Admin will be able to edit and delete your CVs as needed.
 
 ## Contributing
 
