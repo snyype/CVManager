@@ -27,7 +27,7 @@ use Carbon\Carbon;
                 </div><br>
 
                 <div class="flex flex-row">
-                    <div class="basis-1/6 mt-8 ml-8">
+                    <div class="basis-1/6 mt-8 ml-10">
                     
                         <label for="">  NAME  </label><br>
                         <label for=""> TECHNOLOGY  </label><br>
@@ -77,20 +77,20 @@ use Carbon\Carbon;
               
                         
                         <x-primary-button class="ml-3" id="hidecontainer" onclick="removeStatus()">
-                            {{ __('CHANGE STATUS') }}
+                            {{ __('CHANGE STATUS') }} &nbsp;<i class="fa fa-pen"></i>
                         </x-primary-button>
                         <x-primary-button class="ml-3 hidden" id="showcontainer" onclick="addStatus()">
-                            {{ __('CHANGE STATAUS') }}
+                            {{ __('CHANGE STATAUS') }} &nbsp;<i class="fa fa-pen"></i>
                         </x-primary-button>
                         
                         
 
                         <x-primary-button class="ml-3" id="postYourAdd" onclick="postYourAdd()">
-                            {{ __('VIEW CV') }}
+                            {{ __('VIEW CV') }} &nbsp;<i class="fa fa-eye"></i>
                         </x-primary-button>
                        
                         <x-primary-button class="ml-3 hidden" id="removeYourAdd" onclick="removeYourAdd()">
-                            {{ __('HIDE CV') }}
+                            {{ __('HIDE CV') }} &nbsp;<i class="fa fa-eye-slash"></i>
                         </x-primary-button>
                        
                       
@@ -98,6 +98,9 @@ use Carbon\Carbon;
 
              <br>
                 </div>
+             <div id="messageDiv" class="m-10 hidden">
+                <label for="">Scroll Below To Change Status of CV</label>
+             </div>
 
                 <div class="row justify-content-center p-4" id="iframe-container">
                     <iframe class="hidden" id="forPostyouradd" data-src="{{asset('images/cv/'.$data["image"])}}" src="about:blank" height="1000" width="100%"></iframe>
@@ -138,6 +141,7 @@ function removeStatus() {
  var div =  $("#status");
  div.removeClass("hidden");
  $("#hidecontainer").addClass("hidden");
+ $("#messageDiv").removeClass("hidden");
   
 }
 
@@ -156,12 +160,12 @@ function removeStatus() {
                     {{ __("CHANGE CV STATUS OF $data->name") }}
                 </div><br>
                 <div class="pl-6 text-gray-900">
-                 <form action="/admin/changestatus/{{$data->id}}" method="POST">
+                 <form action="/admin/changestatus/{{$data->id}}" method="POST" enctype='multipart/form-data'>
                     @csrf
                     <label for="">CHANGE STATUS</label>
                     
-                    <select name="status" id="status" required>
-                        <option value="{{$data->status}}">{{$data->status}}</option>
+                    <select name="status" id="status">
+                        <option value="">{{$data->status}}</option>
                         <option value="Shortlisted">Shortlisted</option>
                         <option value="1st Interview Done">1st Interview Done</option>
                         <option value="2nd Interview Done">2nd Interview Done</option>
@@ -185,8 +189,12 @@ function removeStatus() {
 
                     <label for="">ASSIGN DATE AND TIME</label>
                     <input min="<?php echo date('Y-m-d\TH:'); ?>" type="datetime-local" value="{{$data->datetime}}" name="datetime"    >
+                    <br><br>
+                    <label for="">Assign Task</label>
+                    <input type="file" name="task">
+                   <br><br><br>
                     <x-primary-button class="ml-3">
-                        {{ __('SUBMIT') }}
+                        {{ __('SUBMIT') }} &nbsp;<i class="fa fa-share"></i>
                     </x-primary-button>
                  </form>
                 </div><br>

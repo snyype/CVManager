@@ -68,9 +68,17 @@ class CVController extends Controller
 
     public function cvlists()
     {
-        $data = CV::all();
+        $data = CV::where('status','!=','Hired')->get();
 
        return view('cvlists',compact('data'));
+    }
+
+
+    public function Hiredcvlists()
+    {
+        $data = CV::where('status','Hired')->get();
+
+       return view('hiredcv',compact('data'));
     }
 
 
@@ -92,18 +100,56 @@ class CVController extends Controller
 
     public function changestatus(Request $request, $id)
     {
+
+        
+
+        if ($file = $request->file('task')) {
+            $request->validate([
+                'task' =>'mimes:jpg,jpeg,png,bmp,docx,pdf'
+            ]);
+            $image = $request->file('task');
+            $imgExt = $image->getClientOriginalExtension();
+            $fullname = $request->name.".".time().".".$imgExt;
+            $result = $image->storeAs('images/task',$fullname);
+            }
+    
+            else{
+                $fullname = 'image.png';
+            }
+            // dd($data->task);
     
         $data = CV::find($id);
         $data2 = interviewer::find($request->interviewer);
-        $data->status = $request->status;
+        if($request->status == NULL){ $data->status = $data->status;}
         $data->interviewer = $request->interviewer;
-        $data->datetime = $request->datetime;   
+        $data->datetime = $request->datetime;  
+        $data->task = $fullname; 
         $data->save();
+
+    
+        
         
 
-        if($data->status == "Hired")
+
+     if (!empty($request->task)) {
+            $details = [
+                'user' => $data->name,
+                'technology' => $data->tech,
+                'task' =>$data->task,
+            ];
+        
+            Mail::to($data->email)
+                ->send(new \App\Mail\TaskMail($details));
+                
+        }
+    
+if(!empty($request->status))
+{
+
+     if($data->status == "Hired")
         {
-           $details = [
+            
+            $details = [
 
             'user' => $data->name,
             'datetime' => $data->datetime,
@@ -117,8 +163,9 @@ class CVController extends Controller
 
         }
 
-        elseif($data->status == "Rejected")
+        if($data->status == "Rejected")
         {
+           
             $details = [
 
                 'user' => $data->name,
@@ -129,6 +176,7 @@ class CVController extends Controller
 
                Mail::to($data->email)->send(new \App\Mail\RejectedMail($details));
         }
+    }
 
         return redirect(url()->previous());
 

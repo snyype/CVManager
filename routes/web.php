@@ -32,32 +32,46 @@ Route::middleware('auth')->group(function () {
     Route::post('/formsubmit', [CVController::class, 'store'])->name('cv.store');
 });
 
-Route::group(['prefix'=>'admin','middleware'=>'admin'],function (){
+
+//Admin Protected Routes
+
+Route::group(['prefix'=>'admin','middleware'=>['admin','verified']],function (){
     Route::get('/view/{id}', [CVController::class, 'indcv'])->name('cv.indcv');
     Route::get('/cvlists',[CVController::class, 'cvlists'])->name('cv.lists');
+    Route::get('/hired',[CVController::class, 'Hiredcvlists'])->name('hiredcv.lists');
     Route::get('/intlists',[CVController::class, 'intlists'])->name('int.intlists');
     Route::get('/addint',[CVController::class, 'addintview'])->name('view.addint');
     Route::get('/cv/change/status/{id}',[CVController::class, 'cvstatuschangeview'])->name('cv.statuschangeview');
     Route::post('/changestatus/{id}',[CVController::class, 'changestatus'])->name('cv.changestatus');
     Route::post('/addinterviewer',[CVController::class, 'addInterviewer'])->name('add.interviewer');
 
+
+
+    //HR Protected Routes
+  
+
 });
+
+
+
+
+
 
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
+})->middleware('auth')->name('verification.noti');
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
  
     return redirect('/home');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+})->middleware(['auth', 'signed'])->name('verification.veri');
 
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
  
     return back()->with('message', 'Verification link sent to your email!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.sen');
 
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
