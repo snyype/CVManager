@@ -54,4 +54,14 @@ class User extends Authenticatable implements MustVerifyEmail
        }
     }
 
+    public function isHR()
+    {
+       if (Auth::user()->role == 3) {
+           return true;
+       }
+       else{
+           return false;
+       }
+    }
+
 }

@@ -3,7 +3,8 @@ use App\Models\Cv;
 use App\Models\User;
 
 $count = User::all()->count();
-$cvcount = Cv::all()->count();
+$cvcount = Cv::where('status',"!=","Hired")->count();
+$hiredcvcount = Cv::where('status','Hired')->count();
 
 @endphp
 
@@ -26,6 +27,7 @@ $cvcount = Cv::all()->count();
        <label for="">Users Count : {{$count}}</label> <br>
        <br>
        <label for=""><a style="color:red" href="/admin/cvlists">CV LISTS ({{$cvcount}})</a></label><br>
+       <label for=""><a style="color:red" href="/admin/hired">Hired CV ({{$hiredcvcount}})</a></label><br>
        <label for=""><a style="color:red" href="/admin/intlists">INTERVIEWER LISTS</a></label><br>
     </div>
             </div>
@@ -61,13 +63,7 @@ $cvcount = Cv::all()->count();
                             <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="PHONE NUMBER" required><br>
                             <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="EMAIL" required><br>
                             <input class="m-10 border-none border-4 border-double rounded-lg" type="text" value="REFRENCE" required><br>
-                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name"></label><br>
-                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">LEVEL:</label><br>
-                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">SALARY EXPECTATION :</label><br>
-                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">EXPERIENCE:</label><br>
-                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">PHONE NUMBER:</label><br>
-                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">EMAIL:</label><br>
-                            <label class="m-10 border-none border-4 border-double rounded-lg" for="name">REFRENCE:</label><br>
+                     
                         </div>
                         <div class="basis-1/6 mt-10 ml-10">
                             <input class="m-10 border border-4 border-double rounded-lg" type="text" name="name" required><br>
@@ -87,34 +83,7 @@ $cvcount = Cv::all()->count();
                    
                    
                 </div>
-                <div class="p-6 pb-0 text-gray-900">
-                   <label for="tech">Technology:</label><br>
-                   
-                </div>
-                <div class="p-6 pb-0 text-gray-900">
-                   <label for="level">Level:</label><br>
-                   <input type="text" name="level" required>
-                </div>
-                <div class="p-6 pb-0 text-gray-900">
-                   <label for="salaryexp">Salary Expectation:</label><br>
-                   <input type="text" name="salaryexp" required>
-                </div>
-                <div class="p-6 pb-0 text-gray-900">
-                   <label for="exp">Experience:</label><br>
-                   <input type="text" name="exp" required>
-                </div>
-                <div class="p-6 pb-0 text-gray-900">
-                   <label for="number">Phone Number:</label><br>
-                   <input type="number" name="number" required>
-                </div>
-                <div class="p-6 pb-0 text-gray-900">
-                   <label for="email">Email:</label><br>
-                   <input type="email" name="email" required>
-                </div>
-                <div class="p-6 text-gray-900">
-                   <label for="ref">Refrences:</label><br>
-                   <input type="text" name="ref" required>
-                </div>
+                
                 <div class="p-6 text-gray-900">
                    <label for="image">Upload Your CV Here:</label><br>
                    <input type="file" name="image">

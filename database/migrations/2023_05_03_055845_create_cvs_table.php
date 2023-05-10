@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string("email");
             $table->string("ref");
             $table->string("image");
+            $table->string("task")->nullable();
             $table->string("interviewer")->default("")->nullable();
             $table->string("interviewer_id")->default("")->nullable();
             $table->string("status")->default('submited')->nullable();

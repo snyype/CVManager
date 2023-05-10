@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>INTERVIEW DATE & </title>
+    <title>Sorry</title>
 </head>
 <body>
     <h1>Sorry {{$details['user']}} your application have been rejected!!</h1>
@@ -10,7 +10,7 @@
             Technology : N/A <br>
             Date & Time : N/A <br>
             Interviewer : N/A <br>
-            Staus : {{$details['status']}} <br>
+            {{-- Staus : {{$details['status']}} <br> --}}
        
         </label>
         <label for="">
