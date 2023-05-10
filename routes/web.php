@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\CVController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Password;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,19 +61,19 @@ Route::group(['prefix'=>'admin','middleware'=>['admin','verified']],function (){
 
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
-})->middleware('auth')->name('verification.noti');
+})->middleware('auth')->name('verification.notification');
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
  
     return redirect('/home');
-})->middleware(['auth', 'signed'])->name('verification.veri');
+})->middleware(['auth', 'signed'])->name('verification.verification');
 
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
  
     return back()->with('message', 'Verification link sent to your email!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.sen');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
@@ -98,17 +100,11 @@ Route::get('/reset-password/{token}', function (string $token) {
 })->middleware('guest')->name('password.reset');
 
 
-Route::get('send-mail', function () {
-   
-    $details = [
-        'title' => 'Mail from ItSolutionStuff.com',
-        'body' => 'This is for testing email using smtp'
-    ];
-   
-    \Mail::to('snypeee@gmail.com')->send(new \App\Mail\Mail($details));
-   
-    dd("Email is Sent.");
-});
+
+
+Route::get('/auth/google', [AuthenticatedSessionController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [AuthenticatedSessionController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 
 
 

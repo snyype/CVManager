@@ -12,6 +12,7 @@ $hiredcvcount = Cv::where('status','Hired')->count();
 
 
 <x-app-layout>
+    
     @if(auth()->check() && auth()->user()->isAdmin())
        
     <div class="py-12">
