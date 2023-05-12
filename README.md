@@ -36,6 +36,11 @@ php artisan migrate
 php artisan serve
 ```
 
+6. API Endpoints Lists:
+```ruby
+http://localhost:8000/api/v1/endpoints
+```
+
 ## Usage
 
 To use CVManager, open your web browser and go to http://localhost:8000. From there, you can create a new account or log in to an existing account.
