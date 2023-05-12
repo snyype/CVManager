@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cv;
 use App\Models\Interviewer;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Response;
+
 
 class CVController extends Controller
 {
@@ -217,4 +221,263 @@ if(!empty($request->status))
       }
     }
 
+
+    public function apiCvLists()
+    {
+        
+        $cvs = Cv::all();
+
+        $response = [
+            [
+                "vdata" => "I",
+                "success" => true,
+            ],
+            [
+                "vdata" => $cvs->toArray(),
+                "message" => "Cv list retrieved successfully.",
+                "status" => 200,
+                "statusText" => "OK"
+            ]
+        ];
+    
+        return response()->json($response);
+        
+    }
+
+    public function apiIndCvLists($id)
+    {
+        
+        $cvs = Cv::find($id);
+
+        $response = [
+            [
+                "vdata" => "I",
+                "success" => true,
+            ],
+            [
+                "vdata" => $cvs->toArray(),
+                "message" => "Cv of $cvs->name retrieved successfully.",
+                "status" => 200,
+                "statusText" => "OK"
+            ]
+        ];
+    
+        return response()->json($response);
+        
+    }
+
+    public function apiUserLists()
+    {
+        
+        $user = User::all();
+
+        $response = [
+            [
+                "vdata" => "I",
+                "success" => true,
+            ],
+            [
+                "vdata" => $user->toArray(),
+                "message" => "Users list retrieved successfully.",
+                "status" => 200,
+                "statusText" => "OK"
+            ]
+        ];
+    
+        return response()->json($response);
+        
+    }
+
+    public function apiSearchQuery(Request $request)
+    {
+       $result = Cv::where('name', 'LIKE',$request->query('query').'%')->orWhere('tech', 'LIKE', '%'.$request->query('query').'%')->get();
+
+
+       $response = [
+        [
+            "vdata" => "I",
+            "success" => true,
+        ],
+        [
+            "vdata" => $result->toArray(),
+            "message" => "Search list retrieved successfully.",
+            "status" => 200,
+            "statusText" => "OK"
+        ]
+    ];
+    return response()->json($response);
+
+    }
+
+
+    public function apiv1Endpoints()
+    {
+        $response = [
+            [    "vdata" => "I",
+                "success" => true,
+            ],
+            [
+            
+                "status" => 200,
+                "statusText" => "OK",
+                "messages" => [
+                    "Users Lists, http://192.168.1.146:8000/api/users , Method : GET",
+                    "Cv Lists, http://192.168.1.146:8000/api/cvlists , Method : GET",
+                    "Indivisual Cv Lists, http://192.168.1.146:8000/api/cvlists/{id}, Method : GET",
+                    "Search , http://192.168.1.146:8000/api/search , Method : POST // Pass value to query filed",
+                    "Interviewer List , http://192.168.1.146:8000/api/intlists , Method : GET",
+                    "Add Interviewer , http://192.168.1.146:8000/api/store-interviewer , Method : POST",
+                    "Sign Up , http://192.168.1.146:8000/api/signup , Method : POST, Fields: name | email | password | password_confirmation",
+                    "Log In , http://192.168.1.146:8000/api/login , Method : POST, Fields: email | password",
+                    "Add CV , http://192.168.1.146:8000/api/store/cv , Method : POST, Fileds : name | tech | level | salaryexp | exp | number | email | ref | image  ",
+                    "Change Status, http://192.168.1.146:8000/api/change/status/{id} , Method : POST",
+                    "Assign Task, http://192.168.1.146:8000/api/assign/task/{id} , Method : POST",
+
+                ]
+            ]
+        ];
+        return response()->json($response);
+    }
+
+    public function apiAddInterviewer(Request $request)
+    {
+        
+        $request->validate([
+            'name'=> 'required',
+            'position'=> 'required',
+           
+          ]);
+          
+    
+          $data = new interviewer();
+          $data->name = $request->name;
+          $data->position = $request->position;
+          $data->save();
+
+          return response()->json([
+            'status' => 'success',
+            'message' => 'Interviewer data added successfully',
+            'data' => $data
+        ], 200);
+          
+    }
+
+    public function sign_up(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|string|unique:users,email',
+            'password' => 'required|string|confirmed'
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password'])
+        ]);
+        $token = $user->createToken('apiToken')->plainTextToken;
+        $res = [
+            'user' => $user,
+            'token' => $token
+        ];
+        return response($res, 201);
+
+    }
+    
+
+    public function apiStoreCv(Request $request)
+    {
+
+       
+
+        $data = new Cv();
+        $data->name = $request->name;
+        $data->tech = $request->tech;
+        $data->level = $request->level;
+        $data->salaryexp = $request->salaryexp;
+        $data->exp = $request->exp;
+        $data->number = $request->number;
+        $data->email = $request->email;
+        $data->ref = $request->ref;
+        $data->image = $request->image;
+        $data->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'CV data added successfully',
+            'data' => $data
+        ], 200);
+
+    }
+
+
+    public function login(Request $request)
+    {
+        $data = $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string'
+        ]);
+
+        $user = User::where('email', $data['email'])->first();
+
+if (!$user || !Hash::check($data['password'], $user->password)) {
+            return response([
+                'msg' => 'incorrect username or password'
+            ], 401);
+        }
+
+        $token = $user->createToken('apiToken')->plainTextToken;
+
+        $res = [
+            'user' => $user,
+            'token' => $token
+        ];
+
+        return response($res, 201);
+    }
+
+
+    public function apiStatusChange(Request $request, $id)
+    {
+        $data = Cv::find($id);
+
+     $status =   $data->status = $request->status;
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Status Changed successfully',
+            'data' => $status
+        ], 200);
+
+    }
+
+    public function apiAssignTask(Request $request, $id)
+    {
+        
+        if ($file = $request->file('task')) {
+            $request->validate([
+                'task' =>'mimes:jpg,jpeg,png,bmp,docx,pdf'
+            ]);
+            $image = $request->file('task');
+            $imgExt = $image->getClientOriginalExtension();
+            $fullname = $request->name.".".time().".".$imgExt;
+            $result = $image->storeAs('images/task',$fullname);
+            }
+    
+            else{
+                $fullname = 'image.png';
+            }
+        
+        $data = Cv::find($id);
+      $status =  $data->task = $fullname;
+        $data->save();
+
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task Assigned successfully',
+            'data' => $status
+        ], 200);
+
+    }
 }

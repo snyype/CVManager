@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string("number");
             $table->string("email");
             $table->string("ref");
-            $table->string("image");
+            $table->string("image")->nullable();
             $table->string("task")->nullable();
             $table->string("interviewer")->default("")->nullable();
             $table->string("interviewer_id")->default("")->nullable();
