@@ -32,6 +32,8 @@ Route::post('login', [CVController::class, 'login']);
 Route::post('signup', [CVController::class, 'sign_up']);
 Route::get('users', [CVController::class, 'apiUserLists']);
 Route::post('store/cv', [CVController::class, 'apiStoreCv']); 
+Route::post('update/cv/{id}', [CVController::class, 'apiUpdateCv']); 
+Route::post('delete/cv/{id}', [CVController::class, 'apiDeleteCv']); 
 Route::post('change/status/{id}', [CVController::class, 'apiStatusChange']); 
 Route::post('assign/task/{id}', [CVController::class, 'apiAssignTask']); 
 

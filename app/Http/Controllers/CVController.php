@@ -321,17 +321,19 @@ if(!empty($request->status))
                 "status" => 200,
                 "statusText" => "OK",
                 "messages" => [
-                    "Users Lists, http://192.168.1.146:8000/api/users , Method : GET",
-                    "Cv Lists, http://192.168.1.146:8000/api/cvlists , Method : GET",
-                    "Indivisual Cv Lists, http://192.168.1.146:8000/api/cvlists/{id}, Method : GET",
-                    "Search , http://192.168.1.146:8000/api/search , Method : POST // Pass value to query filed",
-                    "Interviewer List , http://192.168.1.146:8000/api/intlists , Method : GET",
-                    "Add Interviewer , http://192.168.1.146:8000/api/store-interviewer , Method : POST",
-                    "Sign Up , http://192.168.1.146:8000/api/signup , Method : POST, Fields: name | email | password | password_confirmation",
-                    "Log In , http://192.168.1.146:8000/api/login , Method : POST, Fields: email | password",
-                    "Add CV , http://192.168.1.146:8000/api/store/cv , Method : POST, Fileds : name | tech | level | salaryexp | exp | number | email | ref | image  ",
-                    "Change Status, http://192.168.1.146:8000/api/change/status/{id} , Method : POST",
-                    "Assign Task, http://192.168.1.146:8000/api/assign/task/{id} , Method : POST",
+                    "Users Lists, http://192.168.1.80:8000/api/users , Method : GET",
+                    "Cv Lists, http://192.168.1.80:8000/api/cvlists , Method : GET",
+                    "Indivisual Cv Lists, http://192.168.1.80:8000/api/cvlists/{id}, Method : GET",
+                    "Search , http://192.168.1.80:8000/api/search , Method : POST // Pass value to query filed",
+                    "Interviewer List , http://192.168.1.80:8000/api/intlists , Method : GET",
+                    "Add Interviewer , http://192.168.1.80:8000/api/store-interviewer , Method : POST",
+                    "Sign Up , http://192.168.1.80:8000/api/signup , Method : POST, Fields: name | email | password | password_confirmation",
+                    "Log In , http://192.168.1.80:8000/api/login , Method : POST, Fields: email | password",
+                    "Add CV , http://192.168.1.80:8000/api/store/cv , Method : POST, Fileds : name | tech | level | salaryexp | exp | number | email | ref | image  ",
+                    "Update CV , http://192.168.1.80:8000/api/update/cv/{id} , Method : POST, Fileds : name | tech | level | salaryexp | exp | number | email | ref | image  ",
+                    "Delete CV , http://192.168.1.80:8000/api/delete/cv/{id} ",
+                    "Change Status, http://192.168.1.80:8000/api/change/status/{id} , Method : POST",
+                    "Assign Task, http://192.168.1.80:8000/api/assign/task/{id} , Method : POST",
 
                 ]
             ]
@@ -439,14 +441,16 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
 
     public function apiStatusChange(Request $request, $id)
     {
+     
         $data = Cv::find($id);
 
-     $status =   $data->status = $request->status;
+        $data->status = $request->status;
+        $data->save();
 
         return response()->json([
             'status' => 'success',
             'message' => 'Status Changed successfully',
-            'data' => $status
+            
         ], 200);
 
     }
@@ -478,6 +482,41 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
             'message' => 'Task Assigned successfully',
             'data' => $status
         ], 200);
+
+    }
+
+    public function apiUpdateCv(Request $request, $id)
+    {
+        $data =  Cv::find($id);
+
+        $data->name = $request->name;
+        $data->tech = $request->tech;
+        $data->level = $request->level;
+        $data->salaryexp = $request->salaryexp;
+        $data->exp = $request->exp;
+        $data->number = $request->number;
+        $data->email = $request->email;
+        $data->ref = $request->ref;
+        $data->image = $request->image;
+        $data->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'CV data Updated successfully',
+            'data' => $data
+        ], 200);
+
+    }
+
+    public function apiDeleteCv($id)
+    {
+
+        Cv::where('id',$id)->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cv data deleted successfully'
+        ]);
 
     }
 }
