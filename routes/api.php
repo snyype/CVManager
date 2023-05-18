@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Http\Request;
 use App\Models\Cv;
 use App\Http\Controllers\CVController;
@@ -20,9 +21,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    // Your protected API routes here
+    Route::get('test', [CVController::class, 'test']);
+});
+
 
 Route::get('cvlists', [CVController::class, 'apiCvLists']);
-Route::get('cvlists/{id}', [CVController::class, 'apiIndCvLists'])->middleware('admin');
+Route::get('cvlists/{id}', [CVController::class, 'apiIndCvLists']);
 
 Route::post('search', [CVController::class, 'apiSearchQuery']);
 Route::get('v1/endpoints', [CVController::class, 'apiv1Endpoints']);
@@ -36,5 +42,8 @@ Route::post('update/cv/{id}', [CVController::class, 'apiUpdateCv']);
 Route::post('delete/cv/{id}', [CVController::class, 'apiDeleteCv']); 
 Route::post('change/status/{id}', [CVController::class, 'apiStatusChange']); 
 Route::post('assign/task/{id}', [CVController::class, 'apiAssignTask']); 
+Route::get('cv/hired', [CVController::class, 'apiHiredCVLists']); 
+
+
 
 

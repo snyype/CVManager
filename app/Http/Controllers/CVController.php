@@ -9,11 +9,21 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class CVController extends Controller
 {
     
+    public function test(Request $request)
+    {
+       
+
+            return response()->json('Authenticated Test');
+    
+    
+    }
+
     public function store(Request $request)
     {
         //CREATE
@@ -37,7 +47,7 @@ class CVController extends Controller
             ]);
             $image = $request->file('image');
             $imgExt = $image->getClientOriginalExtension();
-            $fullname = $request->name.".".time().".".$imgExt;
+            $fullname = time().".".$imgExt;
             $result = $image->storeAs('images/cv',$fullname);
             }
     
@@ -113,7 +123,7 @@ class CVController extends Controller
             ]);
             $image = $request->file('task');
             $imgExt = $image->getClientOriginalExtension();
-            $fullname = $request->name.".".time().".".$imgExt;
+            $fullname = time().".".$imgExt;
             $result = $image->storeAs('images/task',$fullname);
             }
     
@@ -225,7 +235,8 @@ if(!empty($request->status))
     public function apiCvLists()
     {
         
-        $cvs = Cv::all();
+        $cvs = Cv::orderByDesc('id')->get();
+
 
         $response = [
             [
@@ -312,6 +323,9 @@ if(!empty($request->status))
 
     public function apiv1Endpoints()
     {
+
+        $apiURL = "http://192.168.1.80:8000";
+
         $response = [
             [    "vdata" => "I",
                 "success" => true,
@@ -321,19 +335,21 @@ if(!empty($request->status))
                 "status" => 200,
                 "statusText" => "OK",
                 "messages" => [
-                    "Users Lists, http://192.168.1.80:8000/api/users , Method : GET",
-                    "Cv Lists, http://192.168.1.80:8000/api/cvlists , Method : GET",
-                    "Indivisual Cv Lists, http://192.168.1.80:8000/api/cvlists/{id}, Method : GET",
-                    "Search , http://192.168.1.80:8000/api/search , Method : POST // Pass value to query filed",
-                    "Interviewer List , http://192.168.1.80:8000/api/intlists , Method : GET",
-                    "Add Interviewer , http://192.168.1.80:8000/api/store-interviewer , Method : POST",
-                    "Sign Up , http://192.168.1.80:8000/api/signup , Method : POST, Fields: name | email | password | password_confirmation",
-                    "Log In , http://192.168.1.80:8000/api/login , Method : POST, Fields: email | password",
-                    "Add CV , http://192.168.1.80:8000/api/store/cv , Method : POST, Fileds : name | tech | level | salaryexp | exp | number | email | ref | image  ",
-                    "Update CV , http://192.168.1.80:8000/api/update/cv/{id} , Method : POST, Fileds : name | tech | level | salaryexp | exp | number | email | ref | image  ",
-                    "Delete CV , http://192.168.1.80:8000/api/delete/cv/{id} ",
-                    "Change Status, http://192.168.1.80:8000/api/change/status/{id} , Method : POST",
-                    "Assign Task, http://192.168.1.80:8000/api/assign/task/{id} , Method : POST",
+                    "Users Lists, $apiURL/api/users , Method : GET",
+                    "Cv Lists, $apiURL/api/cvlists , Method : GET",
+                    "Hired Cv Lists, $apiURL/api/cv/hired , Method : GET",
+                    "Indivisual Cv Lists, $apiURL/api/cvlists/{id}, Method : GET",
+                    "Search , $apiURL/api/search , Method : POST // Pass value to query filed",
+                    "Interviewer List , $apiURL/api/intlists , Method : GET",
+                    "Add Interviewer , $apiURL/api/store-interviewer , Method : POST",
+                    "Sign Up , $apiURL/api/signup , Method : POST, Fields: name | email | password | password_confirmation",
+                    "Log In , $apiURL/api/login , Method : POST, Fields: email | password",
+                    "Add CV , $apiURL/api/store/cv , Method : POST, Fileds : name | tech | level | salaryexp | exp | number | email | ref | image  ",
+                    "Update CV , $apiURL/api/update/cv/{id} , Method : POST, Fileds : name | tech | level | salaryexp | exp | number | email | ref | image  ",
+                    "Delete CV ,$apiURL/api/delete/cv/{id} ",
+                    "Change Status, $apiURL/api/change/status/{id} , Method : POST",
+                    "Assign Task, $apiURL/api/assign/task/{id} , Method : POST",
+                    "Images Show, $apiURL/api/images/cv/{pass image name here} , Method : POST",
 
                 ]
             ]
@@ -390,6 +406,19 @@ if(!empty($request->status))
     public function apiStoreCv(Request $request)
     {
 
+        if ($file = $request->file('image')) {
+            $request->validate([
+                'image' =>'mimes:jpg,jpeg,png,bmp,docx,pdf'
+            ]);
+            $image = $request->file('image');
+            $imgExt = $image->getClientOriginalExtension();
+            $fullname = time().".".$imgExt;
+            $result = $image->storeAs('images/cv',$fullname);
+            }
+    
+            else{
+                $fullname = 'image.png';
+            }
        
 
         $data = new Cv();
@@ -401,7 +430,7 @@ if(!empty($request->status))
         $data->number = $request->number;
         $data->email = $request->email;
         $data->ref = $request->ref;
-        $data->image = $request->image;
+        $data->image = $fullname;
         $data->save();
 
         return response()->json([
@@ -453,7 +482,14 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
             
         ], 200);
 
+        
+
+
+
+
     }
+
+    
 
     public function apiAssignTask(Request $request, $id)
     {
@@ -464,7 +500,7 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
             ]);
             $image = $request->file('task');
             $imgExt = $image->getClientOriginalExtension();
-            $fullname = $request->name.".".time().".".$imgExt;
+            $fullname = time().".".$imgExt;
             $result = $image->storeAs('images/task',$fullname);
             }
     
@@ -473,7 +509,7 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
             }
         
         $data = Cv::find($id);
-      $status =  $data->task = $fullname;
+        $status =  $data->task = $fullname;
         $data->save();
 
         
@@ -483,12 +519,39 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
             'data' => $status
         ], 200);
 
+        if (!empty($request->task)) {
+            $details = [
+                'user' => $data->name,
+                'technology' => $data->tech,
+                'task' =>$data->task,
+            ];
+        
+            Mail::to($data->email)
+                ->send(new \App\Mail\TaskMail($details));
+                
+        }
+
     }
 
     public function apiUpdateCv(Request $request, $id)
     {
         $data =  Cv::find($id);
 
+        
+        if ($file = $request->file('image')) {
+            $request->validate([
+                'image' =>'mimes:jpg,jpeg,png,bmp,docx,pdf'
+            ]);
+            $image = $request->file('image');
+            $imgExt = $image->getClientOriginalExtension();
+            $fullname = time().".".$imgExt;
+            $result = $image->storeAs('images/cv',$fullname);
+            }
+    
+            else{
+                $fullname = $data->image;
+            }
+       
         $data->name = $request->name;
         $data->tech = $request->tech;
         $data->level = $request->level;
@@ -497,7 +560,7 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
         $data->number = $request->number;
         $data->email = $request->email;
         $data->ref = $request->ref;
-        $data->image = $request->image;
+        $data->image = $fullname;
         $data->save();
 
         return response()->json([
@@ -511,7 +574,22 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
     public function apiDeleteCv($id)
     {
 
-        Cv::where('id',$id)->delete();
+      $cv =  Cv::find($id);
+
+        if (!$cv) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cv not found'
+            ], 404);
+        }
+
+        $cv->delete();
+        $imageFilename = $cv->image; // Assuming 'image' is the column that stores the image file name
+        $imagePath = public_path('images/cv/' . $imageFilename); // Assuming the images are stored in 'public/images/cv/'
+
+        if (File::exists($imagePath)) {
+            File::delete($imagePath);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -519,4 +597,24 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
         ]);
 
     }
+
+
+    public function apiHiredCVLists()
+    {
+
+        $cv = CV::where('status',"Hired")->get();
+
+  
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cv Lists retrived successfully [Hired]',
+            'data' => $cv
+        ]);
+
+
+    }
+   
+
 }

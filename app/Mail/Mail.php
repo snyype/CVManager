@@ -40,7 +40,7 @@ class Mail extends Mailable
      */
    public function build()
    {
-    return $this->subject('Interview Time And Interviewee Name')
+    return $this->subject('Interview Time And Interviewe Name')
                         ->view('mail.mail');
    }
 }

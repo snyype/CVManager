@@ -60,6 +60,7 @@ class AuthenticatedSessionController extends Controller
             return Socialite::driver('google')->redirect();
           
             // Redirect to the login page with an error message
+            
            
     }
     
