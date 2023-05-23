@@ -14,14 +14,12 @@ use Illuminate\Support\Facades\Storage;
 
 class CVController extends Controller
 {
-    
+
     public function test(Request $request)
     {
-       
 
-            return response()->json('Authenticated Test');
-    
-    
+
+        return response()->json('Authenticated Test');
     }
 
     public function store(Request $request)
@@ -37,169 +35,160 @@ class CVController extends Controller
             'number' => 'required',
             'email' => 'required',
             'ref' => 'required',
-           
-            
+
+
         ]);
 
         if ($file = $request->file('image')) {
             $request->validate([
-                'image' =>'mimes:jpg,jpeg,png,bmp,docx,pdf'
+                'image' => 'mimes:jpg,jpeg,png,bmp,docx,pdf'
             ]);
             $image = $request->file('image');
             $imgExt = $image->getClientOriginalExtension();
-            $fullname = time().".".$imgExt;
-            $result = $image->storeAs('images/cv',$fullname);
-            }
-    
-            else{
-                $fullname = 'image.png';
-            }
-
-        
-     
-            $data = new Cv();
-            $data->name = $request->name;
-            $data->tech = $request->tech;
-            $data->level = $request->level;
-            $data->salaryexp = $request->salaryexp;
-            $data->exp = $request->exp;
-            $data->number = $request->number;
-            $data->email = $request->email;
-            $data->ref = $request->ref;
-            $data->image = $fullname;
-            $data->save();
+            $fullname = time() . "." . $imgExt;
+            $result = $image->storeAs('images/cv', $fullname);
+        } else {
+            $fullname = 'image.png';
+        }
 
 
-        if($data->save()){
+
+        $data = new Cv();
+        $data->name = $request->name;
+        $data->tech = $request->tech;
+        $data->level = $request->level;
+        $data->salaryexp = $request->salaryexp;
+        $data->exp = $request->exp;
+        $data->number = $request->number;
+        $data->email = $request->email;
+        $data->ref = $request->ref;
+        $data->image = $fullname;
+        $data->save();
+
+
+        if ($data->save()) {
             //Redirect with Flash message
             return redirect('/')->with('status', 'Success!');
-        }
-        else{
+        } else {
             return redirect('/')->with('status', 'There was an error!');
         }
-
     }
 
     public function cvlists()
     {
-        $data = CV::where('status','!=','Hired')->get();
+        $data = CV::where('status', '!=', 'Hired')->get();
 
-       return view('cvlists',compact('data'));
+        return view('cvlists', compact('data'));
     }
 
 
     public function Hiredcvlists()
     {
-        $data = CV::where('status','Hired')->get();
+        $data = CV::where('status', 'Hired')->get();
 
-       return view('hiredcv',compact('data'));
+        return view('hiredcv', compact('data'));
     }
 
 
     public function indcv($id)
     {
-        $data0 = interviewer::where('status','available')->get();
-        $data = CV::find($id);
-        return view('indcv',compact('data','data0'));
+        $data0 = interviewer::where('status', 'available')->get();
+        $data = CV::findorfail($id);
+        return view('indcv', compact('data', 'data0'));
     }
 
 
     public function cvstatuschangeview($id)
     {
-        $data0 = interviewer::where('status','available')->get();
+        $data0 = interviewer::where('status', 'available')->get();
         $data = CV::find($id);
-        return view('statuschange',compact('data','data0'));
+        return view('statuschange', compact('data', 'data0'));
     }
 
 
     public function changestatus(Request $request, $id)
     {
 
-        
+
 
         if ($file = $request->file('task')) {
             $request->validate([
-                'task' =>'mimes:jpg,jpeg,png,bmp,docx,pdf'
+                'task' => 'mimes:jpg,jpeg,png,bmp,docx,pdf'
             ]);
             $image = $request->file('task');
             $imgExt = $image->getClientOriginalExtension();
-            $fullname = time().".".$imgExt;
-            $result = $image->storeAs('images/task',$fullname);
-            }
-    
-            else{
-                $fullname = 'image.png';
-            }
-            // dd($data->task);
-    
+            $fullname = time() . "." . $imgExt;
+            $result = $image->storeAs('images/task', $fullname);
+        } else {
+            $fullname = 'image.png';
+        }
+        // dd($data->task);
+
         $data = CV::find($id);
-        $data2 = interviewer::find($request->interviewer);
-        if($request->status == NULL){ $data->status = $data->status;}
+        $data2 = interviewer::where('name', $request->interviewer)->first();
+        if ($request->status == NULL) {
+            $data->status = $data->status;
+        }
         $data->interviewer = $request->interviewer;
-        $data->datetime = $request->datetime;  
-        $data->task = $fullname; 
+        $data->interviewer_id = $data2->id;
+        $data->datetime = $request->datetime;
+        $data->task = $fullname;
         $data->save();
 
-    
-        
-        
 
 
-     if (!empty($request->task)) {
+
+
+
+        if (!empty($request->task)) {
             $details = [
                 'user' => $data->name,
                 'technology' => $data->tech,
-                'task' =>$data->task,
+                'task' => $data->task,
             ];
-        
+
             Mail::to($data->email)
                 ->send(new \App\Mail\TaskMail($details));
-                
-        }
-    
-if(!empty($request->status))
-{
-
-     if($data->status == "Hired")
-        {
-            
-            $details = [
-
-            'user' => $data->name,
-            'datetime' => $data->datetime,
-            'interviewer' => $data->interviewer,
-            'status' => $data->status,
-            'technology' =>$data->tech,
-
-           ];
-
-           Mail::to($data->email)->send(new \App\Mail\Mail($details));
-
         }
 
-        if($data->status == "Rejected")
-        {
-           
-            $details = [
+        if (!empty($request->status)) {
 
-                'user' => $data->name,
-                'status' => $data->status,
-               
-    
-               ];
+            if ($data->status == "Hired") {
 
-               Mail::to($data->email)->send(new \App\Mail\RejectedMail($details));
+                $details = [
+
+                    'user' => $data->name,
+                    'datetime' => $data->datetime,
+                    'interviewer' => $data->interviewer,
+                    'status' => $data->status,
+                    'technology' => $data->tech,
+
+                ];
+
+                Mail::to($data->email)->send(new \App\Mail\Mail($details));
+            }
+
+            if ($data->status == "Rejected") {
+
+                $details = [
+
+                    'user' => $data->name,
+                    'status' => $data->status,
+
+
+                ];
+
+                Mail::to($data->email)->send(new \App\Mail\RejectedMail($details));
+            }
         }
-    }
 
         return redirect(url()->previous());
-
     }
 
     public function intlists()
     {
         $data = interviewer::all();
-        return view('interviewerslist',compact('data'));
+        return view('interviewerslist', compact('data'));
     }
 
 
@@ -210,25 +199,24 @@ if(!empty($request->status))
 
     public function addInterviewer(Request $request)
     {
-    
-      $request ->validate([
-        'name'=> 'required',
-        'position'=> 'required',
-        'datetime'=> 'required',
-      ]);
 
-      $data = new interviewer();
-      $data->name = $request->name;
-      $data->position = $request->position;
-      $data->datetime = $request->datetime;
-      $data->save();
+        $request->validate([
+            'name' => 'required',
+            'position' => 'required',
+            'datetime' => 'required',
+        ]);
 
-      if($data->save()){
-        return redirect('/admin/intlists');
-      }
-      else{
-        return redirect('/admin/intlists');
-      }
+        $data = new interviewer();
+        $data->name = $request->name;
+        $data->position = $request->position;
+        $data->datetime = $request->datetime;
+        $data->save();
+
+        if ($data->save()) {
+            return redirect('/admin/intlists');
+        } else {
+            return redirect('/admin/intlists');
+        }
     }
 
 
@@ -238,26 +226,36 @@ if(!empty($request->status))
         $cvs = Cv::orderByDesc('id')->get();
 
 
-        $response = [
-            [
-                "vdata" => "I",
-                "success" => true,
-            ],
-            [
-                "vdata" => $cvs->toArray(),
-                "message" => "Cv list retrieved successfully.",
-                "status" => 200,
-                "statusText" => "OK"
-            ]
-        ];
-    
-        return response()->json($response);
-        
+        if ($cvs->count() == 0) {
+
+            $response = [
+                "message" => "Empty Database",
+                "status" => 404,
+                "statusText" => "error"
+            ];
+            return response()->json($response);
+        } else {
+
+            $response = [
+                [
+                    "vdata" => "I",
+                    "success" => true,
+                ],
+                [
+                    "vdata" => $cvs->toArray(),
+                    "message" => "Cv list retrieved successfully.",
+                    "status" => 200,
+                    "statusText" => "OK"
+                ]
+            ];
+
+            return response()->json($response);
+        }
     }
 
     public function apiIndCvLists($id)
     {
-        
+
         $cvs = Cv::find($id);
 
         $response = [
@@ -272,14 +270,13 @@ if(!empty($request->status))
                 "statusText" => "OK"
             ]
         ];
-    
+
         return response()->json($response);
-        
     }
 
     public function apiUserLists()
     {
-        
+
         $user = User::all();
 
         $response = [
@@ -294,30 +291,28 @@ if(!empty($request->status))
                 "statusText" => "OK"
             ]
         ];
-    
+
         return response()->json($response);
-        
     }
 
     public function apiSearchQuery(Request $request)
     {
-       $result = Cv::where('name', 'LIKE',$request->query('query').'%')->orWhere('tech', 'LIKE', '%'.$request->query('query').'%')->get();
+        $result = Cv::where('name', 'LIKE', $request->query('query') . '%')->orWhere('tech', 'LIKE', '%' . $request->query('query') . '%')->get();
 
 
-       $response = [
-        [
-            "vdata" => "I",
-            "success" => true,
-        ],
-        [
-            "vdata" => $result->toArray(),
-            "message" => "Search list retrieved successfully.",
-            "status" => 200,
-            "statusText" => "OK"
-        ]
-    ];
-    return response()->json($response);
-
+        $response = [
+            [
+                "vdata" => "I",
+                "success" => true,
+            ],
+            [
+                "vdata" => $result->toArray(),
+                "message" => "Search list retrieved successfully.",
+                "status" => 200,
+                "statusText" => "OK"
+            ]
+        ];
+        return response()->json($response);
     }
 
 
@@ -327,11 +322,12 @@ if(!empty($request->status))
         $apiURL = "http://192.168.1.80:8000";
 
         $response = [
-            [    "vdata" => "I",
+            [
+                "vdata" => "I",
                 "success" => true,
             ],
             [
-            
+
                 "status" => 200,
                 "statusText" => "OK",
                 "messages" => [
@@ -341,7 +337,7 @@ if(!empty($request->status))
                     "Indivisual Cv Lists, $apiURL/api/cvlists/{id}, Method : GET",
                     "Search , $apiURL/api/search , Method : POST // Pass value to query filed",
                     "Interviewer List , $apiURL/api/intlists , Method : GET",
-                    "Add Interviewer , $apiURL/api/store-interviewer , Method : POST",
+                    "Add Interviewer , $apiURL/api/addInterviewer , Method : POST",
                     "Sign Up , $apiURL/api/signup , Method : POST, Fields: name | email | password | password_confirmation",
                     "Log In , $apiURL/api/login , Method : POST, Fields: email | password",
                     "Add CV , $apiURL/api/store/cv , Method : POST, Fileds : name | tech | level | salaryexp | exp | number | email | ref | image  ",
@@ -359,25 +355,24 @@ if(!empty($request->status))
 
     public function apiAddInterviewer(Request $request)
     {
-        
-        $request->validate([
-            'name'=> 'required',
-            'position'=> 'required',
-           
-          ]);
-          
-    
-          $data = new interviewer();
-          $data->name = $request->name;
-          $data->position = $request->position;
-          $data->save();
 
-          return response()->json([
+        $request->validate([
+            'name' => 'required',
+            'position' => 'required',
+
+        ]);
+
+
+        $data = new interviewer();
+        $data->name = $request->name;
+        $data->position = $request->position;
+        $data->save();
+
+        return response()->json([
             'status' => 'success',
             'message' => 'Interviewer data added successfully',
             'data' => $data
         ], 200);
-          
     }
 
     public function sign_up(Request $request)
@@ -399,27 +394,25 @@ if(!empty($request->status))
             'token' => $token
         ];
         return response($res, 201);
-
     }
-    
+
 
     public function apiStoreCv(Request $request)
     {
 
         if ($file = $request->file('image')) {
             $request->validate([
-                'image' =>'mimes:jpg,jpeg,png,bmp,docx,pdf'
+                'image' => 'mimes:jpg,jpeg,png,bmp,docx,pdf'
             ]);
             $image = $request->file('image');
             $imgExt = $image->getClientOriginalExtension();
-            $fullname = time().".".$imgExt;
-            $result = $image->storeAs('images/cv',$fullname);
-            }
-    
-            else{
-                $fullname = 'image.png';
-            }
-       
+            $fullname = time() . "." . $imgExt;
+            $result = $image->storeAs('images/cv', $fullname);
+        } else {
+            $fullname = 'image.png';
+        }
+
+
 
         $data = new Cv();
         $data->name = $request->name;
@@ -438,7 +431,6 @@ if(!empty($request->status))
             'message' => 'CV data added successfully',
             'data' => $data
         ], 200);
-
     }
 
 
@@ -451,7 +443,7 @@ if(!empty($request->status))
 
         $user = User::where('email', $data['email'])->first();
 
-if (!$user || !Hash::check($data['password'], $user->password)) {
+        if (!$user || !Hash::check($data['password'], $user->password)) {
             return response([
                 'msg' => 'incorrect username or password'
             ], 401);
@@ -470,7 +462,7 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
 
     public function apiStatusChange(Request $request, $id)
     {
-     
+
         $data = Cv::find($id);
 
         $data->status = $request->status;
@@ -479,79 +471,68 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
         return response()->json([
             'status' => 'success',
             'message' => 'Status Changed successfully',
-            
+
         ], 200);
-
-        
-
-
-
-
     }
 
-    
+
 
     public function apiAssignTask(Request $request, $id)
     {
-        
+
         if ($file = $request->file('task')) {
             $request->validate([
-                'task' =>'mimes:jpg,jpeg,png,bmp,docx,pdf'
+                'task' => 'mimes:jpg,jpeg,png,bmp,docx,pdf'
             ]);
             $image = $request->file('task');
             $imgExt = $image->getClientOriginalExtension();
-            $fullname = time().".".$imgExt;
-            $result = $image->storeAs('images/task',$fullname);
-            }
-    
-            else{
-                $fullname = 'image.png';
-            }
-        
+            $fullname = time() . "." . $imgExt;
+            $result = $image->storeAs('images/task', $fullname);
+        } else {
+            $fullname = 'image.png';
+        }
+
         $data = Cv::find($id);
         $status =  $data->task = $fullname;
         $data->save();
 
-        
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Task Assigned successfully',
-            'data' => $status
-        ], 200);
 
         if (!empty($request->task)) {
             $details = [
                 'user' => $data->name,
                 'technology' => $data->tech,
-                'task' =>$data->task,
+                'task' => $data->task,
             ];
-        
+
             Mail::to($data->email)
                 ->send(new \App\Mail\TaskMail($details));
-                
         }
 
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task Assigned successfully',
+            'data' => $status
+        ], 200);
     }
 
     public function apiUpdateCv(Request $request, $id)
     {
         $data =  Cv::find($id);
 
-        
+
         if ($file = $request->file('image')) {
             $request->validate([
-                'image' =>'mimes:jpg,jpeg,png,bmp,docx,pdf'
+                'image' => 'mimes:jpg,jpeg,png,bmp,docx,pdf'
             ]);
             $image = $request->file('image');
             $imgExt = $image->getClientOriginalExtension();
-            $fullname = time().".".$imgExt;
-            $result = $image->storeAs('images/cv',$fullname);
-            }
-    
-            else{
-                $fullname = $data->image;
-            }
-       
+            $fullname = time() . "." . $imgExt;
+            $result = $image->storeAs('images/cv', $fullname);
+        } else {
+            $fullname = $data->image;
+        }
+
         $data->name = $request->name;
         $data->tech = $request->tech;
         $data->level = $request->level;
@@ -568,13 +549,12 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
             'message' => 'CV data Updated successfully',
             'data' => $data
         ], 200);
-
     }
 
     public function apiDeleteCv($id)
     {
 
-      $cv =  Cv::find($id);
+        $cv =  Cv::find($id);
 
         if (!$cv) {
             return response()->json([
@@ -595,16 +575,15 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
             'status' => 'success',
             'message' => 'Cv data deleted successfully'
         ]);
-
     }
 
 
     public function apiHiredCVLists()
     {
 
-        $cv = CV::where('status',"Hired")->get();
+        $cv = CV::where('status', "Hired")->get();
 
-  
+
 
 
         return response()->json([
@@ -612,9 +591,13 @@ if (!$user || !Hash::check($data['password'], $user->password)) {
             'message' => 'Cv Lists retrived successfully [Hired]',
             'data' => $cv
         ]);
-
-
     }
-   
 
+    public function apiIntLists()
+    {
+        $int = Interviewer::all();
+
+
+        return response()->json($int);
+    }
 }

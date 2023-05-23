@@ -7,12 +7,12 @@
 
 </head>
 
-    <div class="p-6 text-gray-900 w-1000">
+    <div class="p-6 text-gray-900">
         <input 
         wire:model="query"
         type="search" 
         id="search-bar"
-        placeholder="SEARCH..." 
+        placeholder="press '/ ' to focus search" 
         wire:keydown.tab="resetData"
         wire:keydown.escape="resetData"
         >
@@ -57,7 +57,7 @@
 @else
 
 <div class="border border-black m-5 h-20 text-justify">
-    <p class="m-5">NO RESULTS.... <li class="fa fa-search"></li></p>
+    <p class="m-5">NO RESULTS.. <li class="fa fa-search"></li></p>
     
 </div>
 
@@ -81,6 +81,7 @@
         } else {
           searchBar.focus(); // If it doesn't, focus the search bar to add focus
         }
+        
 
       }
     });

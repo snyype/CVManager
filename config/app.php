@@ -169,6 +169,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
+        L5Swagger\L5SwaggerServiceProvider::class,
+        
+
 
     ])->toArray(),
 

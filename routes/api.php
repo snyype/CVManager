@@ -17,6 +17,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+/**
+ * @OA\Info(
+ *     title="API Title",
+ *     version="1.0.0",
+ *     description="API description"
+ * )
+ */
+
+
+
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -28,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('cvlists', [CVController::class, 'apiCvLists']);
+Route::get('intlists', [CVController::class, 'apiIntLists']);
 Route::get('cvlists/{id}', [CVController::class, 'apiIndCvLists']);
 
 Route::post('search', [CVController::class, 'apiSearchQuery']);

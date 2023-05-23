@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\SteamController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\CVController;
 use Illuminate\Http\Request;
@@ -106,6 +107,9 @@ Route::get('/reset-password/{token}', function (string $token) {
 Route::get('/auth/google', [AuthenticatedSessionController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [AuthenticatedSessionController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
+
+Route::get('/auth/steam', [SteamController::class, 'redirectToSteam'])->name('steam.login');
+Route::get('/auth/steam/callback', [SteamController::class, 'handleSteamCallback'])->name('steam.callback');
 
 
 
